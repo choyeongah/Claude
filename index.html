@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>웨딩 퀘스트</title>
+<meta name="description" content="복짱구 &amp; 조짱아의 결혼 준비 RPG — D-14부터 본식까지">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Jua&family=Gaegu:wght@700&family=Press+Start+2P&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/galmuri/dist/Galmuri11.css" rel="stylesheet">
+<style>
+:root{
+  --pixel:'Galmuri11','Jua',-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Malgun Gothic',sans-serif;
+  --arcade:'Press Start 2P','Galmuri11','Jua',monospace;
+  --round:'Jua','Galmuri11',-apple-system,'Apple SD Gothic Neo','Malgun Gothic',sans-serif;
+  --ui-bg:rgba(26,32,58,.92);
+  --ui-bg2:rgba(40,48,80,.95);
+  --ui-line:#8fa4d8;
+  --ui-line2:#2b3560;
+  --gold:#ffd873;
+  --gold2:#e0a93a;
+  --ink:#f2f5ff;
+  --dim:#aab3d4;
+  --hp:#ff5f6d;
+  --mp:#4fc3f7;
+  --exp:#ffd25a;
+  --pink:#ff9ec4;
+  --green:#7ee08a;
+  --shadow:0 6px 0 rgba(0,0,0,.35), 0 10px 30px rgba(20,30,60,.35);
+  --sprite-h:clamp(180px, 30vh, 330px);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0;height:100%}
+body{
+  font-family:var(--round);
+  color:var(--ink);
+  background:#eaf3ef;
+  overflow:hidden;
+}
+button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit}
+img{display:block}
+
+/* ---------- SCENE ---------- */
+#scene{position:fixed;inset:0;overflow:hidden;background:#f6fbf7}
+.layer{position:absolute;inset:0}
+.sky{background:radial-gradient(130% 90% at 50% 6%, #ffffff 0%, #f7fdf9 38%, #e6f3ea 78%, #d9ecdf 100%)}
+/* 창밖 나무 */
+.trees{
+  background:
+    radial-gradient(closest-side, rgba(58,110,58,.95), rgba(58,110,58,0) 72%) -6% 46%/30% 70% no-repeat,
+    radial-gradient(closest-side, rgba(96,152,84,.9), rgba(96,152,84,0) 72%)  8% 24%/26% 54% no-repeat,
+    radial-gradient(closest-side, rgba(74,132,74,.85), rgba(74,132,74,0) 72%) 24% 44%/24% 60% no-repeat,
+    radial-gradient(closest-side, rgba(120,176,104,.8), rgba(120,176,104,0) 72%) 40% 16%/26% 46% no-repeat,
+    radial-gradient(closest-side, rgba(70,128,72,.9), rgba(70,128,72,0) 72%) 58% 40%/26% 62% no-repeat,
+    radial-gradient(closest-side, rgba(104,162,92,.88), rgba(104,162,92,0) 72%) 78% 22%/28% 56% no-repeat,
+    radial-gradient(closest-side, rgba(62,116,62,.92), rgba(62,116,62,0) 72%) 98% 48%/30% 68% no-repeat,
+    linear-gradient(180deg, rgba(150,196,140,.35), rgba(96,150,96,.55));
+  filter:blur(5px) saturate(1.12);
+}
+/* 잎사귀 결 */
+.leaves{
+  background:
+    repeating-linear-gradient(58deg, rgba(255,255,255,.10) 0 3px, transparent 3px 9px),
+    repeating-linear-gradient(-52deg, rgba(20,60,25,.10) 0 2px, transparent 2px 11px);
+  filter:blur(1px);opacity:.75
+}
+.bokeh{
+  background:
+    radial-gradient(circle, rgba(255,255,255,.95), transparent 62%) 20% 26%/64px 64px no-repeat,
+    radial-gradient(circle, rgba(255,255,255,.85), transparent 62%) 68% 18%/46px 46px no-repeat,
+    radial-gradient(circle, rgba(255,255,255,.75), transparent 62%) 86% 40%/76px 76px no-repeat,
+    radial-gradient(circle, rgba(255,255,255,.8), transparent 62%) 10% 50%/54px 54px no-repeat,
+    radial-gradient(circle, rgba(255,255,255,.7), transparent 62%) 46% 30%/40px 40px no-repeat;
+  filter:blur(4px)
+}
+/* 전구 (유리 뒤) */
+.lights{pointer-events:none;bottom:34%}
+.wire{position:absolute;height:2px;border-radius:2px;
+  background:linear-gradient(90deg,transparent,rgba(74,80,90,.55) 10%,rgba(74,80,90,.55) 90%,transparent)}
+.bulb{
+  position:absolute;width:11px;height:11px;border-radius:50%;margin-left:-5px;
+  background:radial-gradient(circle at 38% 32%, #fffbe6, #ffd070 58%, #eda52f);
+  box-shadow:0 0 10px 4px rgba(255,205,110,.6), 0 0 26px 11px rgba(255,205,110,.25);
+  animation:twinkle 3.6s ease-in-out infinite
+}
+.bulb::before{content:"";position:absolute;left:3.5px;top:-5px;width:4px;height:6px;background:#61666f;border-radius:2px}
+@keyframes twinkle{0%,100%{opacity:.72;transform:scale(1)}50%{opacity:1;transform:scale(1.14)}}
+/* 흰색 창틀 */
+.window{
+  --bar:#fffdf8;
+  --barW:11px;
+  bottom:26%;
+  background:
+    /* 가운데 프렌치도어 겹침 */
+    linear-gradient(90deg,transparent 0 calc(50% - 15px),var(--bar) calc(50% - 15px) calc(50% + 15px),transparent calc(50% + 15px)),
+    /* 세로 창살 */
+    repeating-linear-gradient(90deg,var(--bar) 0 var(--barW),transparent var(--barW) 15.6%),
+    /* 가로 창살 */
+    repeating-linear-gradient(180deg,var(--bar) 0 var(--barW),transparent var(--barW) 128px);
+  box-shadow:
+    inset 0 0 0 14px var(--bar),
+    inset 0 0 22px rgba(120,150,160,.22),
+    0 10px 24px rgba(120,150,160,.18);
+}
+.window::before{ /* 상단 트랜섬 */
+  content:"";position:absolute;left:0;right:0;top:11%;height:13px;background:var(--bar);
+  box-shadow:0 2px 6px rgba(120,150,160,.2)
+}
+.window::after{ /* 하단 벽 */
+  content:"";position:absolute;left:0;right:0;bottom:-2px;height:15%;
+  background:linear-gradient(180deg,rgba(255,255,255,.2),#fffdf8 45%);
+  box-shadow:inset 0 10px 14px rgba(255,255,255,.9)
+}
+.glassglow{
+  bottom:26%;
+  background:linear-gradient(118deg, rgba(255,255,255,.62) 0 15%, rgba(255,255,255,.05) 28% 58%, rgba(255,255,255,.45) 72% 88%, rgba(255,255,255,.1) 100%);
+  mix-blend-mode:screen;pointer-events:none
+}
+/* 창가 조명 (스프라이트가 녹아드는 흰 빛) */
+.keylight{
+  background:
+    radial-gradient(30% 40% at 50% 66%, rgba(255,255,255,1) 0%, rgba(255,255,255,.96) 46%, rgba(255,255,255,0) 82%),
+    radial-gradient(62% 56% at 50% 72%, rgba(255,255,255,.9) 0%, rgba(255,255,255,.55) 48%, rgba(255,255,255,0) 84%);
+  pointer-events:none
+}
+/* 바닥 */
+.floor{
+  top:auto;bottom:0;height:26%;
+  background:
+    linear-gradient(180deg,#eef5f3 0%, #fbfdfc 30%, #ffffff 100%),
+    repeating-linear-gradient(90deg, rgba(176,196,200,.45) 0 1px, transparent 1px 92px);
+  border-top:2px solid rgba(176,196,200,.55);
+  box-shadow:inset 0 14px 20px rgba(150,180,180,.16)
+}
+.floor::before{
+  content:"";position:absolute;inset:0;
+  background:repeating-linear-gradient(180deg, rgba(176,196,200,.3) 0 1px, transparent 1px 40px)
+}
+.floor::after{ /* 반사광 */
+  content:"";position:absolute;left:50%;transform:translateX(-50%);top:-6%;width:70%;height:70%;
+  background:radial-gradient(60% 70% at 50% 0%, rgba(255,255,255,.95), rgba(255,255,255,0) 72%)
+}
+/* 화분 */
+.plant{position:absolute;bottom:11.5%;width:150px;height:186px;pointer-events:none;opacity:.6;filter:blur(1.2px) saturate(.85)}
+.plant.l{left:-24px}
+.plant.r{right:-24px;transform:scaleX(-1)}
+.plant i{
+  position:absolute;border-radius:60% 40% 55% 45%/55% 45% 60% 40%;
+  background:linear-gradient(160deg,#a9d69c,#5d9a60);
+  box-shadow:inset -3px -5px 8px rgba(0,0,0,.14)
+}
+.plant i:nth-child(1){left:34px;bottom:52px;width:64px;height:96px;transform:rotate(-24deg)}
+.plant i:nth-child(2){left:66px;bottom:64px;width:58px;height:104px;transform:rotate(12deg)}
+.plant i:nth-child(3){left:12px;bottom:44px;width:54px;height:78px;transform:rotate(-46deg)}
+.plant i:nth-child(4){left:84px;bottom:40px;width:46px;height:70px;transform:rotate(38deg)}
+.plant b{ /* 화분 */
+  position:absolute;left:38px;bottom:0;width:78px;height:58px;border-radius:6px 6px 14px 14px;
+  background:linear-gradient(180deg,#f3ece2,#d9cfc0);box-shadow:inset 0 4px 0 rgba(255,255,255,.7), 0 6px 12px rgba(120,140,130,.25)
+}
+.vignette{background:radial-gradient(120% 92% at 50% 42%, transparent 52%, rgba(120,150,160,.2));pointer-events:none}
+
+/* ---------- CHARACTERS ---------- */
+#stage{position:absolute;left:0;right:0;bottom:calc(9% + 52px);display:flex;justify-content:center;align-items:flex-end;gap:clamp(4px,3vw,40px);pointer-events:none;z-index:2}
+.char{position:relative;display:flex;flex-direction:column;align-items:center;pointer-events:auto;cursor:pointer}
+.sprite{
+  height:var(--sprite-h);
+  background-image:url("assets/couple.jpg");
+  background-repeat:no-repeat;
+  filter:drop-shadow(0 10px 14px rgba(90,110,130,.28)) saturate(1.04);
+  -webkit-mask-image:radial-gradient(100% 92% at 50% 44%, #000 38%, rgba(0,0,0,.55) 68%, transparent 90%);
+  mask-image:radial-gradient(100% 92% at 50% 44%, #000 38%, rgba(0,0,0,.55) 68%, transparent 90%);
+  position:relative;
+  animation:idle 3.4s ease-in-out infinite;
+  transition:transform .18s ease;
+}
+.char.groom .sprite{aspect-ratio:.396;background-size:354.6% auto;background-position:28.55% 61.9%;animation-delay:-.4s}
+.char.bride .sprite{aspect-ratio:.4465;background-size:314.5% auto;background-position:71.41% 61.9%}
+@keyframes idle{0%,100%{transform:translateY(0) rotate(0deg)}50%{transform:translateY(-7px) rotate(.4deg)}}
+.sprite::after{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(180deg, rgba(255,255,255,0) 62%, rgba(255,255,255,.55) 84%, rgba(255,255,255,.92) 100%);
+}
+.char:active .sprite{transform:scale(.97)}
+.char.cheer .sprite{animation:cheer .5s ease 3}
+@keyframes cheer{0%,100%{transform:translateY(0)}30%{transform:translateY(-22px) rotate(-3deg)}60%{transform:translateY(-6px) rotate(3deg)}}
+.shadowblob{position:absolute;bottom:-10px;width:62%;height:16px;border-radius:50%;background:radial-gradient(ellipse, rgba(110,130,150,.35), transparent 70%);filter:blur(2px)}
+.nametag{
+  font-family:var(--pixel);font-size:12px;letter-spacing:.5px;margin-top:6px;
+  padding:3px 10px;border-radius:4px;background:rgba(26,32,58,.82);
+  border:1px solid rgba(255,255,255,.35);box-shadow:0 2px 0 rgba(0,0,0,.25);
+  white-space:nowrap
+}
+.nametag b{color:var(--gold)}
+.nametag .job{color:var(--pink);font-size:10px;display:block;text-align:center;margin-top:2px}
+.speech{
+  position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%) scale(.6);
+  opacity:0;transform-origin:bottom center;
+  background:#fff;color:#2b3560;border:2px solid #2b3560;border-radius:10px;
+  padding:7px 11px;font-size:13px;white-space:nowrap;box-shadow:0 3px 0 rgba(0,0,0,.18);
+  transition:all .18s cubic-bezier(.2,1.6,.5,1);pointer-events:none;z-index:5;max-width:60vw
+}
+.speech.on{opacity:1;transform:translateX(-50%) scale(1)}
+.speech::after{content:"";position:absolute;top:100%;left:50%;margin-left:-7px;border:7px solid transparent;border-top-color:#2b3560}
+
+/* ---------- UI PANELS ---------- */
+.panel{
+  position:absolute;z-index:6;
+  background:linear-gradient(180deg,var(--ui-bg2),var(--ui-bg));
+  border:2px solid var(--ui-line);
+  border-radius:8px;
+  box-shadow:var(--shadow), inset 0 0 0 2px var(--ui-line2);
+  backdrop-filter:blur(3px);
+  overflow:hidden;
+}
+.ptitle{
+  font-family:var(--pixel);font-size:12px;letter-spacing:1px;
+  padding:8px 10px;display:flex;align-items:center;gap:8px;
+  background:linear-gradient(180deg,#3b4780,#28315c);
+  border-bottom:2px solid var(--ui-line2);color:var(--gold);
+  text-shadow:0 2px 0 rgba(0,0,0,.4);
+}
+.ptitle .ico{font-size:14px;filter:drop-shadow(0 2px 0 rgba(0,0,0,.3))}
+.ptitle .sub{margin-left:auto;font-size:10px;color:var(--dim);letter-spacing:0}
+.pbody{padding:10px;max-height:min(44vh,420px);overflow-y:auto;overscroll-behavior:contain}
+.pbody::-webkit-scrollbar{width:8px}
+.pbody::-webkit-scrollbar-thumb{background:#4b5896;border-radius:4px}
+.pbody::-webkit-scrollbar-track{background:rgba(0,0,0,.2)}
+
+/* D-day banner */
+#dday{
+  top:10px;left:50%;transform:translateX(-50%);
+  padding:8px 18px;text-align:center;border-color:var(--gold);
+  background:linear-gradient(180deg,#ff9ec4,#e56a9c);
+  box-shadow:0 5px 0 #a8447260, 0 10px 24px rgba(200,90,140,.3), inset 0 0 0 2px #fff6;
+}
+#dday .dnum{font-family:var(--arcade);font-size:20px;color:#fff;text-shadow:0 2px 0 #b34a77,0 0 14px #fff8}
+#dday .dsub{font-size:11px;color:#fff;opacity:.95;margin-top:2px;letter-spacing:.5px}
+#dday .edit{font-size:10px;color:#fff;opacity:.7;text-decoration:underline;margin-left:6px}
+
+/* left daily panel */
+#daily{left:12px;top:12px;width:min(280px,42vw)}
+.missionbox{
+  background:rgba(12,16,34,.5);border:1px solid var(--ui-line2);border-radius:6px;
+  padding:9px;margin-bottom:9px
+}
+.missionbox h4{margin:0 0 7px;font-size:13px;color:var(--ink);display:flex;align-items:center;gap:6px}
+.missionbox h4 .cnt{margin-left:auto;font-family:var(--pixel);font-size:11px;color:var(--gold)}
+.slots{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;justify-items:center}
+.slot{
+  width:34px;height:34px;border-radius:6px;font-size:18px;line-height:1;
+  display:flex;align-items:center;justify-content:center;
+  background:rgba(255,255,255,.07);border:2px solid #4b5896;
+  filter:grayscale(1) opacity(.45);transition:all .15s ease
+}
+.slot.on{filter:none;background:rgba(255,216,115,.18);border-color:var(--gold);transform:translateY(-2px);box-shadow:0 3px 0 rgba(0,0,0,.3)}
+.slot:active{transform:scale(.9)}
+.slot.water{font-size:15px}
+.bar{height:9px;border-radius:5px;background:rgba(0,0,0,.45);border:1px solid #3a4478;overflow:hidden;margin-top:8px}
+.bar>i{display:block;height:100%;width:0;border-radius:4px;transition:width .35s cubic-bezier(.3,1.2,.4,1)}
+.streak{font-size:11px;color:var(--dim);margin-top:8px;display:flex;justify-content:space-between}
+.streak b{color:var(--pink)}
+.dailydone{text-align:center;font-family:var(--pixel);font-size:11px;color:var(--green);margin-top:8px;display:none}
+.dailydone.on{display:block;animation:pop .4s ease}
+
+/* right quest panel */
+#quests{right:12px;top:12px;width:min(370px,48vw)}
+.tabs{display:flex;gap:4px;padding:8px 8px 0}
+.tab{
+  flex:1;font-family:var(--pixel);font-size:10px;padding:6px 4px;border-radius:5px 5px 0 0;
+  background:rgba(0,0,0,.28);color:var(--dim);border:1px solid var(--ui-line2);border-bottom:0
+}
+.tab.on{background:linear-gradient(180deg,#4b5896,#3b4780);color:var(--gold)}
+.qrow{
+  display:flex;align-items:center;gap:8px;padding:8px;border-radius:6px;
+  background:rgba(255,255,255,.05);border:1px solid rgba(143,164,216,.25);
+  margin-bottom:6px;cursor:pointer;transition:all .14s ease
+}
+.qrow:hover{background:rgba(255,255,255,.12);transform:translateX(2px)}
+.qrow.done{opacity:.55}
+.qrow.done .qname{text-decoration:line-through;color:var(--dim)}
+.qrow.locked{opacity:.45;cursor:not-allowed}
+.qmark{
+  font-family:var(--pixel);font-size:14px;width:22px;height:22px;flex:0 0 22px;
+  display:flex;align-items:center;justify-content:center;border-radius:4px;
+  background:#ffd873;color:#4a3a10;box-shadow:0 2px 0 #00000055
+}
+.qrow.done .qmark{background:var(--green);color:#123a18}
+.qrow.locked .qmark{background:#5a628c;color:#232a4a}
+.qmeta{min-width:0;flex:1}
+.qname{font-size:13px;line-height:1.25;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.qtags{font-size:10px;color:var(--dim);margin-top:3px;display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.tag{padding:1px 5px;border-radius:3px;background:rgba(255,255,255,.1);font-family:var(--pixel);font-size:9px}
+.tag.d{background:#e56a9c33;color:#ffb8d3}
+.tag.who{background:#4fc3f733;color:#b6e6ff}
+.tag.exp{background:#ffd25a2e;color:#ffe6a6}
+
+/* bottom status bar */
+#statusbar{
+  left:50%;transform:translateX(-50%);bottom:10px;width:min(760px,96vw);
+  display:flex;align-items:center;gap:10px;padding:8px 12px
+}
+.avatar{
+  width:42px;height:42px;flex:0 0 42px;border-radius:6px;overflow:hidden;
+  border:2px solid var(--gold);background:url("assets/couple.jpg") no-repeat;
+  background-size:250% auto;background-position:43% 42%;
+  box-shadow:0 3px 0 rgba(0,0,0,.35)
+}
+.stats{flex:1;min-width:0}
+.statline{display:flex;align-items:center;gap:8px;font-family:var(--pixel);font-size:10px;color:var(--dim)}
+.lv{color:var(--gold);font-size:12px;font-family:var(--arcade)}
+.jobname{color:var(--pink);font-family:var(--round);font-size:11px}
+.meso{margin-left:auto;color:var(--gold);white-space:nowrap;font-family:var(--arcade);font-size:9px}
+.bars{display:flex;gap:6px;margin-top:5px}
+.bars .bar{flex:1;margin-top:0;height:12px;position:relative}
+.bars .bar span{
+  font-family:var(--arcade);
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  font-family:var(--pixel);font-size:9px;text-shadow:0 1px 2px #000;z-index:2
+}
+.btns{display:flex;gap:6px}
+.kbtn{
+  font-family:var(--pixel);font-size:10px;padding:8px 10px;border-radius:6px;
+  background:linear-gradient(180deg,#5b69ad,#3b4780);border:1px solid var(--ui-line);
+  box-shadow:0 3px 0 rgba(0,0,0,.35);color:var(--ink);transition:all .1s
+}
+.kbtn:hover{filter:brightness(1.15)}
+.kbtn:active{transform:translateY(3px);box-shadow:0 0 0 rgba(0,0,0,.35)}
+.kbtn.gold{background:linear-gradient(180deg,#ffd873,#e0a93a);color:#4a3a10}
+.kbtn.pink{background:linear-gradient(180deg,#ff9ec4,#e56a9c);color:#fff}
+
+/* ---------- MODAL ---------- */
+#veil{position:fixed;inset:0;background:rgba(10,14,30,.55);z-index:20;display:none;align-items:center;justify-content:center;padding:16px}
+#veil.on{display:flex}
+.modal{
+  width:min(460px,94vw);max-height:88vh;overflow:auto;animation:pop .25s cubic-bezier(.2,1.5,.5,1);
+  position:relative
+}
+@keyframes pop{0%{transform:scale(.8);opacity:0}100%{transform:scale(1);opacity:1}}
+.modal .pbody{max-height:none;padding:14px}
+.qdesc{font-size:13px;line-height:1.6;color:#dfe5ff;background:rgba(0,0,0,.25);border-radius:6px;padding:10px;border-left:3px solid var(--gold)}
+.checklist{list-style:none;margin:10px 0 0;padding:0;font-size:12px;color:var(--dim)}
+.checklist li{padding:4px 0 4px 18px;position:relative}
+.checklist li::before{content:"◆";position:absolute;left:2px;color:var(--gold);font-size:9px;top:6px}
+.rewards{display:flex;gap:8px;margin-top:12px}
+.rw{flex:1;text-align:center;background:rgba(0,0,0,.3);border:1px solid var(--ui-line2);border-radius:6px;padding:8px}
+.rw b{display:block;font-family:var(--arcade);font-size:13px;color:var(--gold);margin-top:3px}
+.rw small{font-size:10px;color:var(--dim)}
+.mbtns{display:flex;gap:8px;margin-top:14px}
+.mbtns .kbtn{flex:1;font-size:12px;padding:11px}
+.xbtn{position:absolute;right:8px;top:7px;font-family:var(--pixel);font-size:12px;color:var(--dim);z-index:3}
+.xbtn:hover{color:#fff}
+
+/* level up + toast */
+#levelup{
+  position:fixed;left:50%;top:38%;transform:translate(-50%,-50%);z-index:30;
+  font-family:var(--arcade);font-size:clamp(26px,6vw,52px);color:var(--gold);
+  text-shadow:0 0 18px #ffd873, 0 4px 0 #a8701a, 0 8px 22px rgba(0,0,0,.5);
+  opacity:0;pointer-events:none;white-space:nowrap
+}
+#levelup.on{animation:lvup 2s ease forwards}
+@keyframes lvup{
+  0%{opacity:0;transform:translate(-50%,-20%) scale(.4)}
+  18%{opacity:1;transform:translate(-50%,-50%) scale(1.15)}
+  30%{transform:translate(-50%,-50%) scale(1)}
+  75%{opacity:1}
+  100%{opacity:0;transform:translate(-50%,-80%) scale(1)}
+}
+#toasts{position:fixed;left:50%;top:22%;transform:translateX(-50%);z-index:28;pointer-events:none;display:flex;flex-direction:column;align-items:center;gap:6px}
+.toast{
+  font-family:var(--pixel);font-size:13px;color:#fff;
+  text-shadow:0 2px 0 rgba(0,0,0,.6);animation:float 1.6s ease forwards
+}
+.toast.exp{color:#ffe07a}.toast.meso{color:#ffd873}.toast.warn{color:#ff9ec4}
+@keyframes float{0%{opacity:0;transform:translateY(14px) scale(.8)}20%{opacity:1;transform:translateY(0) scale(1)}80%{opacity:1}100%{opacity:0;transform:translateY(-34px)}}
+
+/* petals */
+#petals{position:fixed;inset:0;pointer-events:none;z-index:15;overflow:hidden}
+.petal{position:absolute;top:-24px;font-size:16px;animation:fall linear forwards;opacity:.9}
+@keyframes fall{to{transform:translateY(112vh) rotate(680deg);opacity:0}}
+
+/* ending */
+.photo{width:100%;border-radius:8px;border:2px solid var(--gold);box-shadow:0 6px 18px rgba(0,0,0,.4)}
+.endtxt{text-align:center;font-size:14px;line-height:1.7;margin-top:12px;color:#fff}
+.endtxt b{color:var(--gold);font-family:var(--pixel);font-size:15px}
+
+@media (max-width:860px){
+  :root{--sprite-h:clamp(120px,19vh,190px)}
+  #daily,#quests{position:static;width:auto;margin:0 0 10px}
+  #panels{
+    position:fixed;inset:auto 0 0 0;z-index:6;padding:10px 10px 0;
+    max-height:64vh;overflow-y:auto;-webkit-overflow-scrolling:touch;
+    background:linear-gradient(180deg,transparent,rgba(12,16,34,.35) 40px);
+    padding-bottom:118px;
+  }
+  .pbody{max-height:none}
+  #stage{bottom:auto;top:70px;align-items:flex-start;padding-bottom:58px;z-index:7}
+  .speech{
+    white-space:normal;text-align:center;width:42vw;max-width:42vw;font-size:11.5px;padding:6px 8px;
+    bottom:auto;top:calc(100% + 8px);transform-origin:top center;
+    transform:translateX(-50%) scale(.6)
+  }
+  .speech.on{transform:translateX(-50%) scale(1)}
+  .speech::after{top:auto;bottom:100%;border-top-color:transparent;border-bottom-color:#2b3560}
+  #panels{max-height:58vh}
+  #statusbar{width:calc(100% - 16px);bottom:8px}
+  .avatar{display:none}
+  #dday{top:8px;padding:6px 14px}
+  #dday .dnum{font-size:16px}
+}
+@media (min-width:861px){#panels{display:contents}}
+</style>
+</head>
+<body>
+<div id="scene">
+  <div class="layer sky"></div>
+  <div class="layer trees"></div>
+  <div class="layer leaves"></div>
+  <div class="layer bokeh"></div>
+  <div class="layer lights" id="lights"></div>
+  <div class="layer window"></div>
+  <div class="layer glassglow"></div>
+  <div class="layer keylight"></div>
+  <div class="layer floor"></div>
+  <div class="plant l"><i></i><i></i><i></i><i></i><b></b></div>
+  <div class="plant r"><i></i><i></i><i></i><i></i><b></b></div>
+  <div class="layer vignette"></div>
+</div>
+
+<div id="stage">
+  <div class="char groom" id="charG">
+    <div class="speech" id="spG"></div>
+    <div class="sprite"></div>
+    <div class="shadowblob"></div>
+    <div class="nametag"><b>복짱구</b> <span class="job">신랑 · 예식준비사</span></div>
+  </div>
+  <div class="char bride" id="charB">
+    <div class="speech" id="spB"></div>
+    <div class="sprite"></div>
+    <div class="shadowblob"></div>
+    <div class="nametag"><b>조짱아</b> <span class="job">신부 · 다이어트 마스터</span></div>
+  </div>
+</div>
+
+<div class="panel" id="dday">
+  <div class="dnum" id="ddayNum">D-14</div>
+  <div class="dsub">복짱구 ♥ 조짱아 결혼식 <button class="edit" id="editDate">날짜변경</button></div>
+</div>
+
+<div id="panels">
+  <div class="panel" id="daily">
+    <div class="ptitle"><span class="ico">🔥</span> 일일 미션 · 조짱아 <span class="sub" id="dailyDate"></span></div>
+    <div class="pbody">
+      <div class="missionbox">
+        <h4>🥚 계란 4개 먹기 <span class="cnt" id="eggCnt">0/4</span></h4>
+        <div class="slots" id="eggs"></div>
+        <div class="bar"><i id="eggBar" style="background:linear-gradient(90deg,#ffd873,#ffb347)"></i></div>
+      </div>
+      <div class="missionbox">
+        <h4>💧 물 2L 마시기 <span class="cnt" id="waterCnt">0/2.0L</span></h4>
+        <div class="slots" id="waters"></div>
+        <div class="bar"><i id="waterBar" style="background:linear-gradient(90deg,#4fc3f7,#2196f3)"></i></div>
+      </div>
+      <div class="streak"><span>연속 클리어</span><b id="streak">0일</b></div>
+      <div class="streak"><span>총 클리어</span><b id="totalDays">0일</b></div>
+      <div class="dailydone" id="dailyDone">★ 오늘의 다이어트 미션 클리어! ★</div>
+    </div>
+  </div>
+
+  <div class="panel" id="quests">
+    <div class="ptitle"><span class="ico">📜</span> 결혼준비 퀘스트 <span class="sub" id="qProgress">0 / 0</span></div>
+    <div class="tabs">
+      <button class="tab on" data-tab="all">전체</button>
+      <button class="tab" data-tab="todo">진행중</button>
+      <button class="tab" data-tab="done">완료</button>
+      <button class="tab" data-tab="boss">보스</button>
+    </div>
+    <div class="pbody" id="qlist"></div>
+  </div>
+</div>
+
+<div class="panel" id="statusbar">
+  <div class="avatar"></div>
+  <div class="stats">
+    <div class="statline">
+      <span class="lv" id="lvText">Lv.1</span>
+      <span class="jobname" id="jobText">예비부부 1차</span>
+      <span class="meso" id="mesoText">💰 0 메소</span>
+    </div>
+    <div class="bars">
+      <div class="bar"><span id="hpText">HP 100/100</span><i id="hpBar" style="background:linear-gradient(90deg,#ff5f6d,#c62828);width:100%"></i></div>
+      <div class="bar"><span id="mpText">MP 80/80</span><i id="mpBar" style="background:linear-gradient(90deg,#4fc3f7,#1565c0);width:100%"></i></div>
+      <div class="bar"><span id="expText">EXP 0%</span><i id="expBar" style="background:linear-gradient(90deg,#ffe07a,#f4a72c)"></i></div>
+    </div>
+  </div>
+  <div class="btns">
+    <button class="kbtn" id="btnSound">🔊</button>
+    <button class="kbtn" id="btnReset">초기화</button>
+  </div>
+</div>
+
+<div id="veil"><div class="panel modal" id="modal"></div></div>
+<div id="levelup"></div>
+<div id="toasts"></div>
+<div id="petals"></div>
+
+<script>
+(function(){
+"use strict";
+
+/* ========== 1. 퀘스트 데이터 (결혼 2주 전 할 일) ========== */
+const QUESTS = [
+ {id:"q01", d:14, who:"함께", name:"모바일 청첩장 최종 발송", exp:220, meso:3000, star:2,
+  desc:"D-14, 드디어 카운트다운 시작! 아직 안 보낸 하객들에게 모바일 청첩장을 돌리는 퀘스트다.",
+  list:["카톡 주소록 정리 (중복 발송 주의)","회사 동료 / 친구 / 친척 그룹별 발송","예식장 약도·주차 안내 링크 확인"]},
+ {id:"q02", d:13, who:"함께", name:"하객 명단 & 식사 인원 집계", exp:240, meso:3500, star:3,
+  desc:"몬스터... 아니 하객 수를 세는 퀘스트. 식사 인원이 곧 예산이다!",
+  list:["양가 부모님 하객 수 취합","참석 여부 미회신자 리마인드","예식장에 예상 식수 1차 통보"]},
+ {id:"q03", d:13, who:"조짱아", name:"신부대기실 & 포토테이블 세팅 확인", exp:180, meso:2000, star:1,
+  desc:"신부대기실 꽃 장식, 포토테이블에 올릴 액자와 소품을 정한다.",
+  list:["웨딩 액자 / 폴라로이드 준비","방명록·사인펜 구매","대기실 꽃 장식 컬러 확인"]},
+ {id:"q04", d:12, who:"복짱구", name:"예복 최종 피팅", exp:200, meso:2500, star:2,
+  desc:"복짱구의 장비 착용 퀘스트. 어깨선과 바지 기장을 확인하자.",
+  list:["셔츠·보타이·커프스 세트 확인","구두 / 양말 컬러 매칭","예복 수령일 확정"]},
+ {id:"q05", d:12, who:"조짱아", name:"본식 드레스 가봉 (최종 피팅)", exp:260, meso:3000, star:3,
+  desc:"다이어트의 성과가 드러나는 순간! 드레스 후크가 편하게 잠기는지 확인한다.",
+  list:["속옷·누드브라 착용 후 피팅","걸음걸이 / 앉기 테스트","베일·장갑·구두 굽 높이 확정"]},
+ {id:"q06", d:11, who:"함께", name:"예물 웨딩밴드 사이즈 확인 & 수령", exp:220, meso:4000, star:2,
+  desc:"반지가 안 들어가면 본식에서 대참사. 미리 껴보자.",
+  list:["각인 문구 확인","사이즈 조절 필요 시 즉시 수선 요청","본식 당일 반지 담당자 지정"]},
+ {id:"q07", d:10, who:"함께", name:"식순 & 예식 진행표 확정", exp:230, meso:2500, star:2,
+  desc:"입장부터 행진까지, 우리 예식의 스크립트를 완성하는 퀘스트.",
+  list:["동시입장 / 신부입장 방식 결정","주례 유무 · 성혼선언문 확인","부모님 화촉점화 순서 체크"]},
+ {id:"q08", d:10, who:"복짱구", name:"사회자 · 축가 최종 컨펌", exp:210, meso:3000, star:2,
+  desc:"사회자에게 대본을, 축가팀에게 반주 파일을 전달하자.",
+  list:["사회 대본 전달 & 이름 발음 확인","축가 곡 / MR 파일 전달","답례품(사례비) 봉투 준비"]},
+ {id:"q09", d:9, who:"조짱아", name:"헤어 · 메이크업 리허설", exp:250, meso:3500, star:3,
+  desc:"본식 얼굴을 미리 만들어보는 중요한 퀘스트. 사진으로 꼭 남기자.",
+  list:["정면·측면 사진 촬영해서 비교","반묶음 / 올림머리 결정","피부 톤·립 컬러 확정"]},
+ {id:"q10", d:8, who:"함께", name:"스드메 · 예식장 잔금 정산", exp:240, meso:-50000, star:3,
+  desc:"메소가 빠져나가는 고통의 퀘스트. 그래도 해야 한다!",
+  list:["계약서 대비 추가금 항목 확인","현금영수증 / 카드 결제 정리","축의금 통장·봉투 준비"]},
+ {id:"q11", d:7, who:"함께", name:"양가 부모님 의상 & 한복 점검", exp:200, meso:2500, star:2,
+  desc:"D-7! 부모님 한복과 코사지, 부모님 헤어 예약까지 챙기는 효도 퀘스트.",
+  list:["한복 / 양장 최종 확인","어머님 헤어·메이크업 예약","코사지 & 부케 컬러 매칭"]},
+ {id:"q12", d:6, who:"함께", name:"하객 답례품 · 식권 준비", exp:190, meso:2000, star:1,
+  desc:"멀리서 와주는 하객들을 위한 작은 선물과 안내 담당자를 정한다.",
+  list:["답례품 수량 넉넉히 준비","접수대 담당자(친구) 섭외 및 사례","식권·주차권 전달 방법 확인"]},
+ {id:"q13", d:5, who:"함께", name:"신혼여행 준비 & 여권 확인", exp:260, meso:4000, star:3,
+  desc:"여권 유효기간 6개월! 이거 놓치면 던전 입장 불가다.",
+  list:["여권 만료일 / 비자·ESTA 확인","항공권·숙소 바우처 출력","환전 & 여행자보험 가입"]},
+ {id:"q14", d:4, who:"조짱아", name:"피부관리 · 네일 · 왁싱", exp:220, meso:3000, star:2,
+  desc:"D-4, 컨디션 버프를 두르는 시간. 새로운 시술은 절대 금지!",
+  list:["네일은 드레스·부케 톤에 맞춰서","마사지·팩으로 컨디션 관리","자극적인 시술 금지 (붓기 주의)"]},
+ {id:"q15", d:3, who:"복짱구", name:"이발 & 눈썹 정리", exp:180, meso:1500, star:1,
+  desc:"D-3에 자르는 게 국룰. 너무 짧게 자르면 사진에 남는다.",
+  list:["3일 전 커트 (당일 커트 금지)","눈썹·면도 정리","손톱 정리 (반지 클로즈업 대비)"]},
+ {id:"q16", d:2, who:"함께", name:"예식장 최종 미팅 & 동선 리허설", exp:280, meso:3500, star:3,
+  desc:"식순, 식수, 음향, 동선을 마지막으로 맞춰보는 리허설 퀘스트.",
+  list:["최종 식수 인원 통보","입·퇴장 동선 및 음악 큐 확인","본식 스냅·영상팀과 컷 리스트 공유"]},
+ {id:"q17", d:1, who:"함께", name:"본식 가방 싸기 & 얼리 취침", exp:300, meso:5000, star:2,
+  desc:"내일이 본식! 짐을 싸고 일찍 잠드는 것이 마지막 준비다.",
+  list:["신부 가방: 속옷·스타킹·립·반지·상비약","신랑 가방: 셔츠·양말·봉투·충전기","알람 2개 맞추고 밤 11시 전 취침","라면·짠 음식 금지 (붓기 방지)"]},
+ {id:"q18", d:1, who:"함께", name:"서로에게 편지 쓰기", exp:320, meso:0, star:1,
+  desc:"숨겨진 히든 퀘스트. 2주 동안 고생한 서로에게 손편지를 쓴다. 보상은 EXP가 아니라 추억.",
+  list:["처음 만난 날 떠올리기","고마웠던 순간 3가지 적기","본식 아침에 교환하기"]}
+];
+
+const BOSS = {id:"boss", d:0, who:"함께", name:"[레이드] 본식 · 결혼식 당일", exp:1200, meso:100000, star:5,
+  desc:"모든 퀘스트를 클리어한 자만 입장 가능한 최종 레이드. 복짱구와 조짱아, 평생 파티를 결성하라!",
+  list:["신부대기실 미소 유지 (HP 소모 큼)","입장 속도 천천히 — 스냅을 위하여","혼인서약: 목소리 크게","부케 던지기 성공","평생 파티 결성 ♥"]};
+
+const LINES_G = ["오늘도 화이팅이야 짱아야!","형 결혼한다...","예복 핏 완벽하지?","축의금 봉투 챙겼어!","드레스 진짜 예쁘더라","사회자한테 대본 보냈어","2주만 버티자!","우리 잘하고 있어"];
+const LINES_B = ["계란 먹었어? 나 먹었어!","물 2L는 생각보다 많아...","드레스 지퍼 잠겼다!!","떡볶이... 아니야 참자","네일 무슨 색이 좋을까?","오늘도 클리어!","붓기 빼야 해","2주 뒤면 우리 부부야"];
+
+/* ========== 2. 상태 ========== */
+const KEY = "wedding-quest-v1";
+const today = () => new Date().toISOString().slice(0,10);
+const defaultWedding = () => { const d=new Date(); d.setDate(d.getDate()+14); return d.toISOString().slice(0,10); };
+
+let S = {
+  weddingDate: defaultWedding(),
+  lv:1, exp:0, meso:150000,
+  done:{},                       // questId -> true
+  day:today(), eggs:0, water:0,  // 오늘 일일미션
+  streak:0, totalDays:0, lastClear:"",
+  sound:true
+};
+try{ const raw=localStorage.getItem(KEY); if(raw) S=Object.assign(S,JSON.parse(raw)); }catch(e){}
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} }
+
+/* 날짜가 바뀌면 일일 미션 리셋 */
+function rollDay(){
+  if(S.day !== today()){
+    const y=new Date(); y.setDate(y.getDate()-1);
+    if(S.lastClear !== y.toISOString().slice(0,10) && S.lastClear !== today()) S.streak = 0;
+    S.day = today(); S.eggs = 0; S.water = 0; save();
+  }
+}
+rollDay();
+setInterval(rollDay, 60000);
+
+/* ========== 3. 레벨 / 스탯 ========== */
+const needExp = lv => 240 + (lv-1)*160;
+const JOBS = [[1,"예비부부 1차"],[5,"웨딩플래너 2차"],[9,"본식마스터 3차"],[13,"평생부부 4차"],[17,"전설의 부부 ★"]];
+function jobName(lv){ let n=JOBS[0][1]; JOBS.forEach(j=>{ if(lv>=j[0]) n=j[1]; }); return n; }
+
+const $ = s => document.querySelector(s);
+const el = (t,c,h) => { const e=document.createElement(t); if(c)e.className=c; if(h!=null)e.innerHTML=h; return e; };
+
+function gainExp(n){
+  S.exp += n; let ups=0;
+  while(S.exp >= needExp(S.lv)){ S.exp -= needExp(S.lv); S.lv++; ups++; }
+  if(ups){ levelUp(); }
+  toast("EXP +"+n, "exp"); renderStatus(); save();
+}
+function gainMeso(n){
+  if(!n) return;
+  S.meso += n;
+  toast((n>0?"메소 +":"메소 ")+n.toLocaleString(), "meso");
+  renderStatus(); save();
+}
+
+/* ========== 4. 렌더 ========== */
+function renderStatus(){
+  const need = needExp(S.lv), pct = Math.min(100, S.exp/need*100);
+  $("#lvText").textContent = "Lv."+S.lv;
+  $("#jobText").textContent = jobName(S.lv);
+  $("#mesoText").textContent = "💰 "+S.meso.toLocaleString()+" 메소";
+  $("#expBar").style.width = pct+"%";
+  $("#expText").textContent = "EXP "+S.exp+"/"+need+" ("+pct.toFixed(1)+"%)";
+  const total = QUESTS.length, cleared = QUESTS.filter(q=>S.done[q.id]).length;
+  const hp = Math.round(40 + 60*cleared/total), mp = Math.round(30+70*(S.eggs/4*0.5 + S.water/8*0.5));
+  $("#hpBar").style.width = hp+"%"; $("#hpText").textContent = "HP "+hp*10+"/1000";
+  $("#mpBar").style.width = mp+"%"; $("#mpText").textContent = "MP "+mp*5+"/500";
+  $("#qProgress").textContent = cleared+" / "+total;
+}
+
+function ddayText(){
+  const w = new Date(S.weddingDate+"T00:00:00");
+  const t = new Date(today()+"T00:00:00");
+  const diff = Math.round((w-t)/86400000);
+  return diff>0 ? "D-"+diff : (diff===0 ? "D-DAY ♥" : "결혼 "+(-diff)+"일차 ♥");
+}
+function renderDday(){
+  $("#ddayNum").textContent = ddayText();
+  $("#dailyDate").textContent = S.day.slice(5).replace("-","/");
+}
+
+let tab = "all";
+function renderQuests(){
+  const list = $("#qlist"); list.innerHTML = "";
+  const allDone = QUESTS.every(q=>S.done[q.id]);
+  let items;
+  if(tab === "boss"){
+    items = [BOSS];
+  }else{
+    items = QUESTS.filter(q =>
+      tab === "all" || (tab === "todo" && !S.done[q.id]) || (tab === "done" && !!S.done[q.id]));
+    const showBoss = tab === "all" || (tab === "todo" && !S.done.boss) || (tab === "done" && !!S.done.boss);
+    if(showBoss) items.push(BOSS);
+  }
+  items.forEach(q=>{
+    const isBoss = q.id==="boss";
+    const locked = isBoss && !allDone && !S.done.boss;
+    const row = el("div","qrow"+(S.done[q.id]?" done":"")+(locked?" locked":""));
+    row.innerHTML =
+      '<div class="qmark">'+(S.done[q.id]?"✔":(locked?"🔒":(isBoss?"👑":"!")))+'</div>'+
+      '<div class="qmeta"><span class="qname">'+(isBoss?"👑 ":"")+q.name+'</span>'+
+      '<div class="qtags"><span class="tag d">D-'+q.d+'</span>'+
+      '<span class="tag who">'+q.who+'</span>'+
+      '<span class="tag exp">EXP '+q.exp+'</span>'+
+      '<span>'+"★".repeat(q.star)+'</span></div></div>';
+    row.onclick = ()=> locked ? toast("모든 퀘스트를 먼저 클리어하세요!","warn") : openQuest(q);
+    list.appendChild(row);
+  });
+  if(!items.length) list.appendChild(el("div","qtags",'<span style="padding:12px">해당하는 퀘스트가 없습니다.</span>'));
+  renderStatus();
+}
+
+/* ========== 5. 퀘스트 상세 모달 ========== */
+function openQuest(q){
+  const done = !!S.done[q.id];
+  const m = $("#modal");
+  m.innerHTML =
+    '<button class="xbtn">[ X ]</button>'+
+    '<div class="ptitle"><span class="ico">'+(q.id==="boss"?"👑":"📜")+'</span> '+q.name+
+      '<span class="sub">D-'+q.d+' · '+q.who+'</span></div>'+
+    '<div class="pbody">'+
+      '<div class="qdesc">'+q.desc+'</div>'+
+      '<ul class="checklist">'+q.list.map(x=>"<li>"+x+"</li>").join("")+'</ul>'+
+      '<div class="rewards">'+
+        '<div class="rw"><small>경험치</small><b>'+q.exp+' EXP</b></div>'+
+        '<div class="rw"><small>메소</small><b>'+(q.meso>=0?"+":"")+q.meso.toLocaleString()+'</b></div>'+
+        '<div class="rw"><small>난이도</small><b>'+"★".repeat(q.star)+'</b></div>'+
+      '</div>'+
+      '<div class="mbtns">'+
+        (done
+          ? '<button class="kbtn" data-act="undo">완료 취소</button><button class="kbtn gold" data-act="close">닫기</button>'
+          : '<button class="kbtn" data-act="close">나중에</button><button class="kbtn '+(q.id==="boss"?"pink":"gold")+'" data-act="clear">'+(q.id==="boss"?"레이드 시작 ♥":"퀘스트 완료!")+'</button>')+
+      '</div>'+
+    '</div>';
+  m.querySelector(".xbtn").onclick = closeModal;
+  m.querySelectorAll("[data-act]").forEach(b=>{
+    b.onclick = ()=>{
+      const a = b.dataset.act;
+      if(a==="close") return closeModal();
+      if(a==="undo"){ delete S.done[q.id]; save(); renderQuests(); closeModal(); beep(180,.06); return; }
+      S.done[q.id] = true; save();
+      closeModal(); gainExp(q.exp); gainMeso(q.meso);
+      cheer(); sfxQuest();
+      renderQuests();
+      if(q.id==="boss") ending();
+      else if(QUESTS.every(x=>S.done[x.id])) setTimeout(()=>{ toast("👑 보스 레이드 해금!","warn"); petals(30); }, 700);
+    };
+  });
+  $("#veil").classList.add("on");
+}
+function closeModal(){ $("#veil").classList.remove("on"); }
+$("#veil").onclick = e => { if(e.target.id==="veil") closeModal(); };
+
+/* ========== 6. 일일 미션 ========== */
+function renderDaily(){
+  const eggs = $("#eggs"), waters = $("#waters");
+  eggs.innerHTML = ""; waters.innerHTML = "";
+  for(let i=0;i<4;i++){
+    const s = el("button","slot"+(i<S.eggs?" on":""),"🥚");
+    s.onclick = ()=> setEgg(i);
+    eggs.appendChild(s);
+  }
+  for(let i=0;i<8;i++){
+    const s = el("button","slot water"+(i<S.water?" on":""),"🥤");
+    s.onclick = ()=> setWater(i);
+    waters.appendChild(s);
+  }
+  $("#eggCnt").textContent = S.eggs+"/4";
+  $("#waterCnt").textContent = (S.water*0.25).toFixed(2)+"/2.0L";
+  $("#eggBar").style.width = (S.eggs/4*100)+"%";
+  $("#waterBar").style.width = (S.water/8*100)+"%";
+  $("#streak").textContent = S.streak+"일";
+  $("#totalDays").textContent = S.totalDays+"일";
+  const clear = S.eggs>=4 && S.water>=8;
+  $("#dailyDone").classList.toggle("on", clear);
+  renderStatus();
+}
+function setEgg(i){
+  const v = (i+1===S.eggs) ? i : i+1;
+  const up = v>S.eggs; S.eggs = v;
+  if(up){ gainExp(30); beep(880,.05); } else beep(300,.05);
+  save(); renderDaily(); checkDaily();
+}
+function setWater(i){
+  const v = (i+1===S.water) ? i : i+1;
+  const up = v>S.water; S.water = v;
+  if(up){ gainExp(20); beep(1180,.05); } else beep(300,.05);
+  save(); renderDaily(); checkDaily();
+}
+function checkDaily(){
+  if(S.eggs>=4 && S.water>=8 && S.lastClear!==today()){
+    S.lastClear = today(); S.totalDays++;
+    S.streak = S.streak+1;
+    save();
+    gainExp(150); gainMeso(5000);
+    toast("🔥 일일 미션 클리어! 연속 "+S.streak+"일","warn");
+    petals(18); cheer(); sfxQuest();
+    say("charB","오늘도 클리어! 드레스 각 나온다 💪");
+    renderDaily();
+  }
+}
+
+/* ========== 7. 이펙트 ========== */
+function toast(txt, cls){
+  const t = el("div","toast "+(cls||""),txt);
+  $("#toasts").appendChild(t);
+  setTimeout(()=>t.remove(), 1700);
+}
+function levelUp(){
+  const l = $("#levelup");
+  l.textContent = "LEVEL UP!  Lv."+S.lv;
+  l.classList.remove("on"); void l.offsetWidth; l.classList.add("on");
+  petals(24); sfxLevel();
+  say("charG","레벨업! 우리 좀 잘하는데?");
+}
+function petals(n){
+  const box = $("#petals"), chars = ["🌸","🌸","💗","🤍","🌼"];
+  for(let i=0;i<n;i++){
+    const p = el("div","petal",chars[(Math.random()*chars.length)|0]);
+    p.style.left = (Math.random()*100)+"vw";
+    p.style.animationDuration = (2.6+Math.random()*2.4)+"s";
+    p.style.animationDelay = (Math.random()*.6)+"s";
+    p.style.fontSize = (12+Math.random()*14)+"px";
+    box.appendChild(p);
+    setTimeout(()=>p.remove(), 5600);
+  }
+}
+function cheer(){
+  ["#charG","#charB"].forEach(id=>{
+    const c = $(id); c.classList.remove("cheer"); void c.offsetWidth; c.classList.add("cheer");
+  });
+}
+let sayTimer = {};
+function say(which, txt){
+  const box = which==="charG" ? $("#spG") : $("#spB");
+  box.textContent = txt; box.classList.add("on");
+  clearTimeout(sayTimer[which]);
+  sayTimer[which] = setTimeout(()=>box.classList.remove("on"), 2600);
+}
+$("#charG").onclick = ()=>{ say("charG", LINES_G[(Math.random()*LINES_G.length)|0]); beep(520,.05); };
+$("#charB").onclick = ()=>{ say("charB", LINES_B[(Math.random()*LINES_B.length)|0]); beep(660,.05); };
+
+/* 사운드 */
+let AC=null;
+function ac(){ if(!AC){ try{ AC = new (window.AudioContext||window.webkitAudioContext)(); }catch(e){} } return AC; }
+function beep(f, dur, type){
+  if(!S.sound) return; const c = ac(); if(!c) return;
+  const o=c.createOscillator(), g=c.createGain();
+  o.type=type||"square"; o.frequency.value=f;
+  g.gain.setValueAtTime(.06,c.currentTime);
+  g.gain.exponentialRampToValueAtTime(.001,c.currentTime+(dur||.1));
+  o.connect(g); g.connect(c.destination); o.start(); o.stop(c.currentTime+(dur||.1));
+}
+function sfxLevel(){ [523,659,784,1046].forEach((f,i)=>setTimeout(()=>beep(f,.18,"triangle"), i*95)); }
+function sfxQuest(){ [784,988].forEach((f,i)=>setTimeout(()=>beep(f,.12,"triangle"), i*90)); }
+
+/* ========== 8. 엔딩 ========== */
+function ending(){
+  const m = $("#modal");
+  m.innerHTML =
+    '<button class="xbtn">[ X ]</button>'+
+    '<div class="ptitle"><span class="ico">👑</span> 레이드 클리어! <span class="sub">FINAL</span></div>'+
+    '<div class="pbody">'+
+      '<img class="photo" src="assets/bouquet.jpg" alt="복짱구가 조짱아에게 꽃다발을 건네는 장면">'+
+      '<div class="endtxt"><b>복짱구 ♥ 조짱아</b><br>2주간의 모든 퀘스트를 클리어했습니다.<br>'+
+      '계란 '+(S.totalDays*4)+'개, 물 '+(S.totalDays*2)+'L, 그리고 수많은 체크리스트 끝에<br>'+
+      '두 사람은 <b>평생 파티</b>를 결성했습니다.<br>결혼 축하해! 🎉</div>'+
+      '<div class="mbtns"><button class="kbtn gold" data-act="close">감사합니다 ♥</button></div>'+
+    '</div>';
+  m.querySelector(".xbtn").onclick = closeModal;
+  m.querySelector("[data-act]").onclick = closeModal;
+  $("#veil").classList.add("on");
+  petals(70); setTimeout(()=>petals(70), 900); setTimeout(()=>petals(70), 1800);
+  [523,659,784,1046,784,1046,1318].forEach((f,i)=>setTimeout(()=>beep(f,.24,"triangle"), i*160));
+}
+
+/* ========== 9. 배경 전구 ========== */
+(function lights(){
+  const box = $("#lights");
+  for(let row=0; row<2; row++){
+    const topBase = row===0 ? 16 : 33, bulbs = 15;
+    const wire = el("div","wire");
+    wire.style.cssText = "left:0;right:0;top:"+topBase+"%";
+    box.appendChild(wire);
+    for(let i=0;i<bulbs;i++){
+      const b = el("div","bulb");
+      const x = (i+.5)/bulbs*100;
+      const sag = Math.sin((i/(bulbs-1))*Math.PI)*2.2;
+      b.style.left = x+"%";
+      b.style.top = (topBase+sag)+"%";
+      b.style.animationDelay = (-Math.random()*3.6)+"s";
+      box.appendChild(b);
+    }
+  }
+})();
+
+/* ========== 10. 컨트롤 ========== */
+document.querySelectorAll(".tab").forEach(t=>{
+  t.onclick = ()=>{
+    document.querySelectorAll(".tab").forEach(x=>x.classList.remove("on"));
+    t.classList.add("on"); tab = t.dataset.tab; renderQuests(); beep(440,.04);
+  };
+});
+$("#editDate").onclick = e=>{
+  e.stopPropagation();
+  const v = prompt("결혼식 날짜를 입력하세요 (YYYY-MM-DD)", S.weddingDate);
+  if(v && /^\d{4}-\d{2}-\d{2}$/.test(v)){ S.weddingDate = v; save(); renderDday(); }
+};
+$("#btnSound").onclick = ()=>{
+  S.sound = !S.sound; save();
+  $("#btnSound").textContent = S.sound ? "🔊" : "🔈";
+  if(S.sound) beep(660,.08);
+};
+$("#btnReset").onclick = ()=>{
+  if(!confirm("모든 진행 상황을 초기화할까요?")) return;
+  localStorage.removeItem(KEY); location.reload();
+};
+
+/* ========== 11. 시작 ========== */
+$("#btnSound").textContent = S.sound ? "🔊" : "🔈";
+renderDday(); renderDaily(); renderQuests(); renderStatus();
+setTimeout(()=>say("charG","짱아야, "+ddayText()+"! 퀘스트 하러 가자"), 900);
+setTimeout(()=>say("charB","오늘 계란이랑 물부터 클리어할게!"), 3200);
+})();
+</script>
+</body>
+</html>
