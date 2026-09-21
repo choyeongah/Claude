@@ -8,7 +8,6 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Jua&family=Gaegu:wght@700&family=Press+Start+2P&display=swap" rel="stylesheet">
-<link href="https://cdn.jsdelivr.net/npm/galmuri/dist/Galmuri11.css" rel="stylesheet">
 <style>
 :root{
   --pixel:'Galmuri11','Jua',-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Malgun Gothic',sans-serif;
@@ -229,7 +228,7 @@ img{display:block}
 
 /* D-day banner */
 #dday{
-  top:10px;left:50%;transform:translateX(-50%);
+  top:calc(10px + env(safe-area-inset-top,0px));left:50%;transform:translateX(-50%);
   padding:8px 18px;text-align:center;border-color:var(--gold);
   background:linear-gradient(180deg,#ff9ec4,#e56a9c);
   box-shadow:0 5px 0 #a8447260, 0 10px 24px rgba(200,90,140,.3), inset 0 0 0 2px #fff6;
@@ -297,7 +296,7 @@ img{display:block}
 
 /* bottom status bar */
 #statusbar{
-  left:50%;transform:translateX(-50%);bottom:10px;width:min(760px,96vw);
+  left:50%;transform:translateX(-50%);bottom:calc(10px + env(safe-area-inset-bottom,0px));width:min(760px,96vw);
   display:flex;align-items:center;gap:10px;padding:8px 12px
 }
 .avatar{
@@ -403,9 +402,9 @@ img{display:block}
   .speech.on{transform:translateX(-50%) scale(1)}
   .speech::after{top:auto;bottom:100%;border-top-color:transparent;border-bottom-color:#2b3560}
   #panels{max-height:58vh}
-  #statusbar{width:calc(100% - 16px);bottom:8px}
+  #statusbar{width:calc(100% - 16px);bottom:calc(8px + env(safe-area-inset-bottom,0px))}
   .avatar{display:none}
-  #dday{top:8px;padding:6px 14px}
+  #dday{top:calc(8px + env(safe-area-inset-top,0px));padding:6px 14px}
   #dday .dnum{font-size:16px}
 }
 @media (min-width:861px){#panels{display:contents}}
