@@ -316,18 +316,6 @@
       px(a, CX - 9, 3, 6, 1, c.hair3);          // 머릿결
       px(a, CX + 2, 4, 6, 1, c.hair2);
       px(a, CX - 10, 6, 3, 1, c.hair2);
-      /* 면사포 (웨딩드레스) */
-      if (s.bouquet) {
-        px(a, CX - 13, 6, 3, 26, 'rgba(255,255,255,.72)');
-        px(a, CX + 10, 6, 3, 26, 'rgba(255,255,255,.72)');
-        px(a, CX - 13, 30, 4, 4, 'rgba(255,255,255,.6)');
-        px(a, CX + 9, 30, 4, 4, 'rgba(255,255,255,.6)');
-        px(a, CX - 9, 2, 18, 2, '#ffffff');
-        px(a, CX - 7, 1, 14, 1, '#fff6fa');
-        px(a, CX - 8, 3, 3, 3, '#ffe9f1');   // 머리 위 꽃
-        px(a, CX + 5, 3, 3, 3, '#ffe9f1');
-      }
-
       /* 진주 헤어핀 */
       px(a, CX + 5, 7, 4, 1, '#f6dca6');
       px(a, CX + 6, 6, 1, 1, '#fff7e2');
@@ -465,188 +453,24 @@
   }
 
   function drawArch(ctx, t) {
-    const stone = '#fdf6ea', stone2 = '#e6d8c2', stone3 = '#cbb99e';
-    const petals = ['#ffc2d6', '#ffe1eb', '#f6a9c4', '#ffffff'];
-    const leaf = ['#7fd18b', '#5cb573'];
-
-    /* 기둥 */
-    [4, 48].forEach(x => {
-      px(ctx, x, 14, 8, 56, stone);
-      px(ctx, x, 14, 2, 56, stone2);
-      px(ctx, x + 6, 14, 2, 56, stone3);
-      px(ctx, x - 1, 66, 10, 4, stone);
-      px(ctx, x - 1, 68, 10, 2, stone2);
-    });
-
-    /* 아치 곡선 */
-    roundBox(ctx, 2, 2, 56, 14, 6, stone);
-    px(ctx, 8, 12, 44, 3, stone2);
-
-    /* 꽃 넝쿨 */
-    for (let i = 0; i < 16; i += 1) {
-      const ang = (i / 15) * Math.PI;
-      const x = 30 - Math.cos(ang) * 28 - 3;
-      const y = 8 - Math.sin(ang) * 8 + Math.sin(t / 420 + i) * 1.2;
-      px(ctx, x - 1, y + 4, 7, 3, leaf[i % 2]);
+    const white = '#fffaf2';
+    px(ctx, 4, 12, 6, 58, white);
+    px(ctx, 50, 12, 6, 58, white);
+    px(ctx, 4, 12, 2, 58, '#efe3d2');
+    px(ctx, 54, 12, 2, 58, '#efe3d2');
+    roundBox(ctx, 4, 2, 52, 14, 6, white);
+    px(ctx, 10, 11, 40, 3, '#efe3d2');
+    const petals = ['#ffc2d6', '#ffe1eb', '#f6a9c4', '#ffd9e6'];
+    for (let i = 0; i < 14; i += 1) {
+      const ang = (i / 13) * Math.PI;
+      const x = 30 - Math.cos(ang) * 26 - 3;
+      const y = 9 - Math.sin(ang) * 9 + Math.sin(t / 380 + i) * 1.5;
       px(ctx, x, y, 5, 5, petals[i % petals.length]);
-      px(ctx, x + 1, y + 1, 2, 2, '#fff6fa');
+      px(ctx, x + 1, y + 1, 2, 2, '#fff4f8');
     }
-    for (let i = 0; i < 5; i += 1) {
-      px(ctx, 3, 18 + i * 11, 6, 5, petals[i % petals.length]);
-      px(ctx, 2, 22 + i * 11, 5, 3, leaf[i % 2]);
-      px(ctx, 50, 22 + i * 10, 6, 5, petals[(i + 1) % petals.length]);
-      px(ctx, 52, 26 + i * 10, 5, 3, leaf[(i + 1) % 2]);
-    }
-
-    /* 핑크 리본 */
-    px(ctx, 24, 3, 5, 5, '#ff9fc2');
-    px(ctx, 31, 3, 5, 5, '#ff9fc2');
-    px(ctx, 28, 5, 4, 3, '#ff7fae');
-    px(ctx, 22, 8, 4, 8, '#ffb6d2');
-    px(ctx, 34, 8, 4, 8, '#ffb6d2');
-
-    /* 금색 종 */
-    const swingY = Math.sin(t / 300) * 1;
-    const by = 12 + swingY;
-    profile(ctx, 30, by, [4, 6, 8, 9, 10, 11, 12, 12], '#f7c94a');
-    px(ctx, 24, by + 8, 12, 2, '#ffe387');
-    px(ctx, 25, by + 2, 2, 6, '#ffe9a6');
-    px(ctx, 33, by + 3, 2, 5, '#d79f28');
-    px(ctx, 29, by + 10, 3, 3, '#d79f28');
-    px(ctx, 28, by + 5, 5, 4, '#ff9fc2');   // 종에 하트
-    px(ctx, 29, by + 4, 1, 1, '#ff9fc2');
-    px(ctx, 31, by + 4, 1, 1, '#ff9fc2');
-
-    /* 베일처럼 흐르는 천 */
-    px(ctx, 18, 10, 3, 16, 'rgba(255,255,255,.75)');
-    px(ctx, 39, 10, 3, 16, 'rgba(255,255,255,.75)');
-  }
-
-  /** 오르비스 비행선 (레퍼런스 아트의 그 비행선) */
-  function drawBlimp(ctx, t) {
-    const bob = Math.sin(t / 700) * 1.5;
-    ctx.save();
-    ctx.translate(0, bob);
-    profile(ctx, 34, 0, [18, 30, 40, 46, 50, 52, 52, 50, 46, 40, 30, 18], '#bfe4fb');
-    profile(ctx, 34, 0, [18, 30, 40, 46, 22, 20, 20, 18], '#e6f5ff');
-    px(ctx, 10, 6, 48, 1, '#8fc9ea');
-    px(ctx, 24, 3, 3, 8, '#a8d8f2');
-    px(ctx, 44, 3, 3, 8, '#a8d8f2');
-    // 곰돌이 얼굴
-    px(ctx, 16, 4, 10, 8, '#ffffff');
-    px(ctx, 15, 3, 4, 4, '#ffffff');
-    px(ctx, 23, 3, 4, 4, '#ffffff');
-    px(ctx, 18, 6, 2, 2, '#4a3530');
-    px(ctx, 22, 6, 2, 2, '#4a3530');
-    px(ctx, 20, 9, 2, 1, '#f0a0b8');
-    px(ctx, 17, 9, 2, 1, 'rgba(247,140,158,.6)');
-    px(ctx, 23, 9, 2, 1, 'rgba(247,140,158,.6)');
-    // 곤돌라
-    px(ctx, 28, 12, 14, 5, '#e3c58f');
-    px(ctx, 28, 12, 14, 1, '#f3dbb0');
-    px(ctx, 30, 14, 3, 2, '#8fc9ea');
-    px(ctx, 36, 14, 3, 2, '#8fc9ea');
-    px(ctx, 6, 8, 6, 2, '#d7a86a');
-    ctx.restore();
-  }
-
-  /** 하늘에 떠 있는 오르비스 성 (배경) */
-  function drawCastle(ctx, scale) {
-    const w = '#f2f8ff', b = '#9ec9ec', b2 = '#79aede', gold = '#f3d380';
-    ctx.save();
-    ctx.scale(scale || 1, scale || 1);
-    px(ctx, 6, 26, 52, 22, w);
-    px(ctx, 6, 26, 52, 3, b);
-    px(ctx, 14, 32, 6, 9, b2);
-    px(ctx, 28, 32, 6, 9, b2);
-    px(ctx, 42, 32, 6, 9, b2);
-    [8, 26, 46].forEach((x, i) => {
-      const h = [16, 22, 18][i];
-      px(ctx, x, 26 - h, 10, h, w);
-      px(ctx, x + 1, 26 - h, 2, h, b);
-      profile(ctx, x + 5, 26 - h - 9, [2, 4, 6, 8, 9, 10, 11, 12, 12], b);
-      px(ctx, x + 4, 26 - h - 12, 2, 4, gold);
-    });
-    // 아래쪽 바위섬
-    profile(ctx, 32, 48, [50, 46, 40, 32, 24, 16, 10, 5], '#b9d7a4');
-    profile(ctx, 32, 50, [46, 40, 32, 24, 16, 10, 5], '#a07e57');
-    ctx.restore();
-  }
-
-  /** 하트 배너가 달린 가로등 */
-  function drawLamp(ctx, t) {
-    const gold = '#f0cd7c', gold2 = '#c9a049';
-    px(ctx, 7, 10, 4, 34, gold);
-    px(ctx, 7, 10, 1, 34, gold2);
-    px(ctx, 4, 42, 10, 4, gold);
-    profile(ctx, 9, 0, [6, 9, 10, 10, 10, 9, 7], '#fff3c9');
-    px(ctx, 6, 3, 2, 4, '#ffe9a0');
-    px(ctx, 5, 9, 8, 2, gold2);
-    // 핑크 배너
-    const sway = Math.sin(t / 620) * 0.6;
-    px(ctx, 2 + sway, 14, 12, 14, '#f8a3c1');
-    px(ctx, 2 + sway, 14, 12, 2, '#ffd0e2');
-    profile(ctx, 8 + sway, 28, [12, 10, 8, 6, 4, 2], '#f8a3c1');
-    px(ctx, 5 + sway, 18, 3, 3, '#fff2f7');
-    px(ctx, 9 + sway, 18, 3, 3, '#fff2f7');
-    px(ctx, 4 + sway, 20, 9, 3, '#fff2f7');
-    px(ctx, 6 + sway, 23, 5, 2, '#fff2f7');
-  }
-
-  /** 귀여운 버섯 친구 */
-  function drawMushroom(ctx, t) {
-    const bob = Math.sin(t / 500) * 1;
-    ctx.save();
-    ctx.translate(0, bob);
-    profile(ctx, 9, 0, [6, 10, 14, 16, 16], '#f0803c');
-    px(ctx, 2, 5, 14, 2, '#d9662c');
-    px(ctx, 5, 1, 3, 2, '#ffd9b0');
-    px(ctx, 11, 2, 2, 2, '#ffd9b0');
-    px(ctx, 3, 7, 12, 7, '#fbe8c9');
-    px(ctx, 3, 12, 12, 2, '#e8cfa6');
-    px(ctx, 5, 9, 2, 2, '#4a3530');
-    px(ctx, 11, 9, 2, 2, '#4a3530');
-    px(ctx, 8, 11, 2, 1, '#e08a9a');
-    px(ctx, 4, 11, 2, 1, 'rgba(247,140,158,.55)');
-    px(ctx, 12, 11, 2, 1, 'rgba(247,140,158,.55)');
-    ctx.restore();
-  }
-
-  /** 하얀 솜뭉치 친구 */
-  function drawFluff(ctx, t) {
-    const bob = Math.sin(t / 430 + 1) * 1;
-    ctx.save();
-    ctx.translate(0, bob);
-    profile(ctx, 8, 1, [8, 12, 14, 14, 14, 14, 12, 8], '#ffffff');
-    px(ctx, 1, 6, 2, 3, '#ffffff');
-    px(ctx, 13, 6, 2, 3, '#ffffff');
-    px(ctx, 5, 5, 2, 2, '#4a3530');
-    px(ctx, 10, 5, 2, 2, '#4a3530');
-    px(ctx, 7, 7, 2, 1, '#e08a9a');
-    px(ctx, 3, 7, 2, 1, 'rgba(247,140,158,.55)');
-    px(ctx, 11, 7, 2, 1, 'rgba(247,140,158,.55)');
-    px(ctx, 6, 2, 4, 1, '#ffe3ee');
-    ctx.restore();
-  }
-
-  /** 꽃으로 덮인 돌 난간 (바닥 장식) */
-  function drawRailing(ctx, w, t) {
-    px(ctx, 0, 0, w, 5, '#f6ecd9');
-    px(ctx, 0, 0, w, 1, '#fffaf0');
-    px(ctx, 0, 4, w, 1, '#d9c8a8');
-    for (let x = 2; x < w - 4; x += 12) {
-      px(ctx, x, 5, 3, 7, '#eadfc8');
-      px(ctx, x + 6, 5, 3, 7, '#eadfc8');
-      const heart = x + 2;
-      px(ctx, heart, 6, 5, 3, '#ffd9e6');
-      px(ctx, heart + 1, 9, 3, 1, '#ffd9e6');
-    }
-    const petals = ['#ffc2d6', '#ffffff', '#ffe1eb', '#ff9fc2'];
-    for (let x = 0; x < w; x += 9) {
-      const y = Math.sin((x + t / 40) / 18) * 1;
-      px(ctx, x, -3 + y, 5, 4, '#7fd18b');
-      px(ctx, x + 2, -5 + y, 4, 4, petals[(x / 9) % petals.length]);
-      px(ctx, x + 3, -4 + y, 2, 2, '#fff6fa');
+    for (let i = 0; i < 4; i += 1) {
+      px(ctx, 5, 20 + i * 14, 5, 5, petals[i % petals.length]);
+      px(ctx, 50, 26 + i * 13, 5, 5, petals[(i + 1) % petals.length]);
     }
   }
 
@@ -672,7 +496,6 @@
     drawBok, drawJja, drawPlanner,
     drawEgg, drawWater, drawStar, drawHeartItem,
     drawPlatform, drawArch, drawTower, drawFlower, drawSign,
-    drawBlimp, drawCastle, drawLamp, drawMushroom, drawFluff, drawRailing,
     CHAR_W, CHAR_H, CX, FOOT_Y,
   };
 })(window);

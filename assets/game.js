@@ -72,17 +72,7 @@
     { x: 1560, y: 372, w: 140 },
     { x: 700, y: 196, w: 190 },   // 웨딩 아치 발판
   ];
-  const ARCH = { x: 748, y: 90, w: 90, h: 105 };   // 웨딩 아치 (1.5배로 그림)
-  const LAMPS = [70, 470, 980, 1480];                       // 하트 배너 가로등
-  const CRITTERS = [                                         // 귀여운 친구들
-    { x: 190, y: 396, kind: 'fluff' }, { x: 380, y: 330, kind: 'mushroom' },
-    { x: 720, y: 356, kind: 'fluff' }, { x: 1090, y: 382, kind: 'mushroom' },
-    { x: 1450, y: 250, kind: 'fluff' }, { x: 620, y: GROUND_Y, kind: 'mushroom' },
-    { x: 1240, y: GROUND_Y, kind: 'fluff' },
-  ];
-  const CASTLES = [                                          // 배경에 뜬 성
-    { x: 120, y: 120, s: 0.9 }, { x: 760, y: 70, s: 1.15 }, { x: 1380, y: 130, s: 0.8 },
-  ];
+  const ARCH = { x: 765, y: 128, w: 60, h: 68 };
   const NPC_POS = { x: 178, y: GROUND_Y };   // x: 중심, y: 발바닥
 
   /* 아이템이 놓이는 자리 (발판 위) */
@@ -136,7 +126,7 @@
       weddingDate: CONFIG.weddingDate,
       missions: DEFAULT_MISSIONS.map(m => ({ ...m })),
       progress: {},
-      costume: { bok: 1, jja: 1 },
+      costume: { bok: 0, jja: 0 },
       active: 'jja',
       sound: true,
       createdAt: todayKey(),
@@ -270,14 +260,6 @@
   };
 
   window.addEventListener('keydown', e => {
-    if (!$('#titleScreen').hidden) { e.preventDefault(); startGame(); return; }
-    if (!$('#cutscene').hidden) {
-      if (e.code === 'KeyZ' || e.code === 'Enter' || e.code === 'Escape' || e.code === 'Space') {
-        e.preventDefault();
-        $('#cutscene').hidden = true;
-      }
-      return;
-    }
     if (e.code === 'Escape') { closeAllWindows(); return; }
     if (anyWindowOpen()) return;
     if (e.code === 'Tab') { e.preventDefault(); swapChar(); return; }
@@ -562,14 +544,16 @@
     }
 
     const acx = ARCH.x + ARCH.w / 2;
-    if (Math.abs((p.x + 8) - acx) < 54 && Math.abs(p.y + HITBOX.h - (ARCH.y + ARCH.h)) < 70) {
+    if (Math.abs((p.x + 8) - acx) < 46 && Math.abs(p.y - ARCH.y) < 90) {
       const rate = dayRate(todayKey(), null);
       if (rate >= 1) {
         hearts(acx, ARCH.y + 30);
-        const left = Math.max(0, daysBetween(todayKey(), state.weddingDate));
-        showCutscene(left > 0
-          ? `${CHARS.bok.name} ♡ ${CHARS.jja.name} · 결혼식까지 ${left}일! 오늘도 고생 많았어요 💍`
-          : `${CHARS.bok.name} ♡ ${CHARS.jja.name} · 오늘이 바로 그날! 결혼 축하해요 💒`);
+        say('웨딩 아치', '💒', [
+          '오늘의 결혼준비 퀘스트를 모두 끝냈어요!',
+          `${CHARS.bok.name} ♡ ${CHARS.jja.name}, 결혼식까지 ${Math.max(0, daysBetween(todayKey(), state.weddingDate))}일!`,
+          '오늘도 고생 많았어요. 내일 또 만나요 💍',
+        ]);
+        sfx('levelup');
       } else {
         say('웨딩 아치', '💒', [
           `아직 오늘 퀘스트가 ${Math.round(rate * 100)}% 남아 있어요.`,
@@ -621,7 +605,7 @@
 
   /** 땅 아래를 채우는 오르비스 구름 바다 */
   function drawCloudSea(t) {
-    const top = GROUND_Y + 30;
+    const top = GROUND_Y + 18;
     ctx.fillStyle = '#e8f3ff';
     ctx.fillRect(cam.x - 20, top + 8, VIEW_W + 40, WORLD.h - top);
     const startX = Math.floor((cam.x - 40) / 34) * 34;
@@ -654,39 +638,6 @@
       if (x < -4 || x > VIEW_W + 4) return;
       ctx.fillRect(Math.round(x), Math.round(s.y - cam.y * 0.12), s.s, s.s);
     });
-
-    // 하늘에 뜬 오르비스 성
-    CASTLES.forEach(c => {
-      const x = Math.round(c.x - cam.x * 0.34);
-      if (x < -120 || x > VIEW_W + 120) return;
-      ctx.save();
-      ctx.globalAlpha = 0.9;
-      ctx.translate(x, Math.round(c.y - cam.y * 0.3 + Math.sin(t / 1600 + c.x) * 2));
-      Sprites.drawCastle(ctx, c.s);
-      ctx.restore();
-      ctx.globalAlpha = 1;
-    });
-
-    // 오르비스 비행선
-    const blimpX = ((t / 36) % (WORLD.w + 700)) - 350 - cam.x * 0.28;
-    if (blimpX > -140 && blimpX < VIEW_W + 40) {
-      ctx.save();
-      ctx.translate(Math.round(blimpX), Math.round(40 - cam.y * 0.25));
-      Sprites.drawBlimp(ctx, t);
-      ctx.restore();
-    }
-
-    // 떠다니는 하트
-    for (let i = 0; i < 9; i += 1) {
-      const hx = ((i * 197 + t / 90) % (VIEW_W + 60)) - 30;
-      const hy = 60 + ((i * 83) % 200) + Math.sin(t / 600 + i) * 10;
-      ctx.globalAlpha = 0.5 + Math.sin(t / 500 + i) * 0.25;
-      ctx.fillStyle = i % 2 ? '#ffb3cd' : '#ffffff';
-      ctx.fillRect(hx, hy, 2, 2);
-      ctx.fillRect(hx + 3, hy, 2, 2);
-      ctx.fillRect(hx + 1, hy + 2, 3, 2);
-    }
-    ctx.globalAlpha = 1;
 
     // 오르비스 시계탑
     ctx.save();
@@ -786,33 +737,6 @@
       }
     });
 
-    // 바닥 꽃 난간
-    const railStart = Math.floor((cam.x - 60) / 60) * 60;
-    for (let x = railStart; x < cam.x + VIEW_W + 60; x += 60) {
-      ctx.save();
-      ctx.translate(x, GROUND_Y + 15);
-      Sprites.drawRailing(ctx, 60, t + x);
-      ctx.restore();
-    }
-
-    // 하트 배너 가로등
-    LAMPS.forEach(lx => {
-      if (lx - cam.x < -40 || lx - cam.x > VIEW_W + 40) return;
-      ctx.save();
-      ctx.translate(lx, GROUND_Y - 46);
-      Sprites.drawLamp(ctx, t);
-      ctx.restore();
-    });
-
-    // 귀여운 친구들
-    CRITTERS.forEach(cr => {
-      if (cr.x - cam.x < -30 || cr.x - cam.x > VIEW_W + 30) return;
-      ctx.save();
-      ctx.translate(cr.x, cr.y - (cr.kind === 'mushroom' ? 14 : 12));
-      (cr.kind === 'mushroom' ? Sprites.drawMushroom : Sprites.drawFluff)(ctx, t + cr.x * 7);
-      ctx.restore();
-    });
-
     // 시작 지점 표지판
     ctx.save();
     ctx.translate(112, GROUND_Y - 20);
@@ -826,14 +750,13 @@
     const allDone = dayRate(todayKey(), null) >= 1;
     ctx.save();
     ctx.translate(ARCH.x, ARCH.y);
-    ctx.scale(1.5, 1.5);
     if (allDone) {
       ctx.shadowColor = 'rgba(255,214,102,.95)';
-      ctx.shadowBlur = 12;
+      ctx.shadowBlur = 10;
     }
     Sprites.drawArch(ctx, t);
     ctx.restore();
-    if (allDone && tick % 40 < 20) pixelText('♡ 축하해요 ♡', ARCH.x + ARCH.w / 2, ARCH.y - 14, '#fff2b8');
+    if (allDone && tick % 40 < 20) pixelText('♡ 축하해요 ♡', ARCH.x + ARCH.w / 2, ARCH.y - 12, '#fff2b8');
 
     // NPC
     ctx.save();
@@ -902,10 +825,10 @@
     // 상호작용 안내 (아치/NPC 근처)
     const p = player();
     const nearNpc = Math.abs(p.x + HITBOX.w / 2 - NPC_POS.x) < 36 && Math.abs(p.y + HITBOX.h - NPC_POS.y) < 60;
-    const nearArch = Math.abs((p.x + 8) - (ARCH.x + ARCH.w / 2)) < 54 && Math.abs(p.y + HITBOX.h - (ARCH.y + ARCH.h)) < 70;
+    const nearArch = Math.abs((p.x + 8) - (ARCH.x + ARCH.w / 2)) < 46 && Math.abs(p.y - ARCH.y) < 90;
     if (nearNpc || nearArch) {
       const tx = nearNpc ? NPC_POS.x : ARCH.x + ARCH.w / 2;
-      const ty = (nearNpc ? NPC_POS.y - 56 : ARCH.y - 6) + Math.sin(t / 220) * 2;
+      const ty = (nearNpc ? NPC_POS.y - 56 : ARCH.y + 14) + Math.sin(t / 220) * 2;
       pixelText('Z 대화', tx, ty, '#fff8d0');
     }
     ctx.restore();
@@ -950,7 +873,7 @@
 
   function step(t) {
     tick += 1;
-    const winOpen = anyWindowOpen() || !$('#dialogue').hidden || introOpen();
+    const winOpen = anyWindowOpen() || !$('#dialogue').hidden;
 
     if (winOpen) {
       player().vx *= 0.5;
@@ -1034,29 +957,6 @@
     $('#hudDaily').style.width = `${Math.round(total * 100)}%`;
     $('#hudDailyText').textContent = `오늘 ${done}/${state.missions.length}`;
   }
-
-  /* ========== 타이틀 / 컷신 ========== */
-  const titleEl = () => $('#titleScreen');
-  const cutEl = () => $('#cutscene');
-  const introOpen = () => !titleEl().hidden || !cutEl().hidden;
-
-  function startGame() {
-    if (titleEl().hidden) return;
-    titleEl().hidden = true;
-    sfx('levelup');
-    showHint(`🌤 ${MAP_NAME} · ← → 이동 · Space 점프 · Z 대화 · Tab 전환`);
-  }
-
-  function showCutscene(text) {
-    $('#cutText').textContent = text;
-    cutEl().hidden = false;
-    hearts(player().x + 8, player().y);
-    sfx('levelup');
-  }
-
-  $('#startBtn').addEventListener('click', startGame);
-  $('#cutCloseBtn').addEventListener('click', () => { cutEl().hidden = true; });
-  titleEl().addEventListener('click', startGame);
 
   /* ========== 창 ========== */
   const WINDOWS = ['questWindow', 'missionModal', 'helpModal'];
@@ -1281,11 +1181,8 @@
   actors.jja.x = 296;
   cam.x = clamp(player().x - VIEW_W / 2, 0, WORLD.w - VIEW_W);
   cam.y = clamp(player().y - VIEW_H * 0.5, 0, Math.max(0, WORLD.h - VIEW_H));
-  (function initTitle() {
-    const left = daysBetween(todayKey(), state.weddingDate);
-    $('#titleDday').textContent = left > 0 ? `D-${left}` : left === 0 ? 'D-DAY' : `D+${Math.abs(left)}`;
-  })();
+  showHint(`🌤 ${MAP_NAME} · ← → 이동 · Space 점프 · Z 대화 · Tab 캐릭터 전환`);
   requestAnimationFrame(step);
 
-  window.GAME = { state, stats: () => stats, items: () => items, actors, openWindow, rebuild: rebuildItems, refresh: () => { stats = computeStats(); syncHud(); } };
+  window.GAME = { state, stats: () => stats, items: () => items, actors, openWindow };
 })();
