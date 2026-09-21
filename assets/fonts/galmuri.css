@@ -1,0 +1,25 @@
+/* Galmuri — 메이플스토리풍 한글 픽셀 폰트
+ * Copyright (c) 2019–2025 Lee Minseo (quiple@quiple.dev), Reserved Font Name "Galmuri".
+ * SIL Open Font License 1.1 — 전문은 같은 폴더의 OFL.md 참고.
+ */
+@font-face {
+  font-family: Galmuri11;
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+  src: local('Galmuri11 Regular'), url('./Galmuri11.woff2') format('woff2');
+}
+@font-face {
+  font-family: Galmuri11;
+  font-style: normal;
+  font-weight: 700;
+  font-display: block;
+  src: local('Galmuri11 Bold'), url('./Galmuri11-Bold.woff2') format('woff2');
+}
+@font-face {
+  font-family: Galmuri9;
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+  src: local('Galmuri9 Regular'), url('./Galmuri9.woff2') format('woff2');
+}
