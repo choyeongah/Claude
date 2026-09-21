@@ -69,7 +69,7 @@ img{display:block}
 /* 이름 명패 — 원본 아트의 명패 위에 정확히 덮어쓴다 */
 .plate{
   position:absolute;z-index:3;display:flex;align-items:center;justify-content:center;
-  top:75.5%;height:6.8%;width:8.8%;
+  top:75.5%;height:6.8%;width:9.5%;
   background:linear-gradient(180deg,#f0dcc6,#dcbb9c);
   clip-path:polygon(7% 0,93% 0,100% 24%,100% 76%,93% 100%,7% 100%,0 76%,0 24%);
   filter:drop-shadow(0 calc(var(--sw)*.0012) 0 rgba(0,0,0,.35))
@@ -81,11 +81,11 @@ img{display:block}
 }
 .plate span{
   position:relative;z-index:1;color:#fff;font-family:var(--round);
-  font-size:calc(var(--sw)*.0235);line-height:1;letter-spacing:.06em;
+  font-size:calc(var(--sw)*.0225);line-height:1;letter-spacing:.01em;white-space:nowrap;
   text-shadow:0 calc(var(--sw)*.0011) 0 rgba(0,0,0,.55)
 }
-#plateG{left:39.1%}
-#plateB{left:50.2%}
+#plateG{left:38.75%}
+#plateB{left:49.85%}
 
 /* 클릭 영역 + 직업 명패 */
 .hotspot{position:absolute;cursor:pointer;z-index:3;border-radius:14px}
@@ -349,8 +349,8 @@ img{display:block}
   <div id="stage">
     <div class="art"></div>
     <div id="couple"></div>
-    <div class="plate" id="plateG"><span>짱구</span></div>
-    <div class="plate" id="plateB"><span>짱아</span></div>
+    <div class="plate" id="plateG"><span>복짱구</span></div>
+    <div class="plate" id="plateB"><span>조짱아</span></div>
     <div class="hotspot" id="hsG"></div>
     <div class="hotspot" id="hsB"></div>
     <div class="jobchip" id="chipG"><span class="full">신랑 · 예식준비사</span><span class="short">신랑</span> <b>Lv.1</b></div>
