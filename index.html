@@ -276,10 +276,20 @@ img{display:block}
 @keyframes fall{to{transform:translateY(112vh) rotate(680deg);opacity:0}}
 
 /* ending */
-.album{display:grid;grid-template-columns:1.45fr 1fr;gap:8px;align-items:stretch}
-.album .photo{height:100%;object-fit:cover}
-.photo{width:100%;border-radius:8px;border:2px solid var(--gold);box-shadow:0 6px 18px rgba(0,0,0,.4)}
-@media (max-width:520px){.album{grid-template-columns:1fr}.album .photo{height:auto}}
+.endart{
+  position:relative;overflow:hidden;
+  width:min(300px,78%);margin:0 auto;aspect-ratio:.8994;
+  background:url("assets/scene.webp") 50% 26.32%/243.9% 123.46% no-repeat;
+  border-radius:10px;border:3px solid var(--gold);
+  box-shadow:0 8px 22px rgba(0,0,0,.45), inset 0 0 0 2px rgba(255,255,255,.5), 0 0 26px rgba(255,216,115,.35)
+}
+.endart i{
+  position:absolute;inset:-40%;pointer-events:none;
+  background:linear-gradient(112deg, transparent 38%, rgba(255,255,255,.72) 48%, transparent 58%);
+  animation:shine 2.8s ease-in-out .5s infinite
+}
+@keyframes shine{0%{transform:translateX(-78%)}55%,100%{transform:translateX(78%)}}
+@media (prefers-reduced-motion:reduce){.endart i{animation:none}}
 .endtxt{text-align:center;font-size:14px;line-height:1.7;margin-top:12px;color:#fff}
 .endtxt b{color:var(--gold);font-family:var(--pixel);font-size:15px}
 
@@ -720,10 +730,7 @@ function ending(){
     '<button class="xbtn">[ X ]</button>'+
     '<div class="ptitle"><span class="ico">👑</span> 레이드 클리어! <span class="sub">FINAL</span></div>'+
     '<div class="pbody">'+
-      '<div class="album">'+
-        '<img class="photo" src="assets/bouquet.jpg" alt="복짱구가 조짱아에게 꽃다발을 건네는 장면">'+
-        '<img class="photo" src="assets/couple.jpg" alt="턱시도와 웨딩드레스를 입고 나란히 선 복짱구와 조짱아">'+
-      '</div>'+
+      '<div class="endart" role="img" aria-label="웨딩 아치 아래 손을 잡고 선 복짱구와 조짱아"><i></i></div>'+
       '<div class="endtxt"><b>복짱구 ♥ 조짱아</b><br>2주간의 모든 퀘스트를 클리어했습니다.<br>'+
       '계란 '+(S.totalDays*4)+'개, 물 '+(S.totalDays*2)+'L, 그리고 수많은 체크리스트 끝에<br>'+
       '두 사람은 <b>평생 파티</b>를 결성했습니다.<br>결혼 축하해! 🎉</div>'+
